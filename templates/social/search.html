@@ -1,0 +1,31 @@
+{% extends 'landing/base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row mt-5">
+        <div class="col-md-5 col-sm-6">
+           <a href="{% url 'post-list' %}" class="btn btn-light">フィード行く</a>
+        </div>
+    </div>
+    {% for profile in profile_list %}
+    <div class="row justify-content-center mt-3">
+        <div class="col-md-5 col-sm-12 border-bottom position-relative">
+            <div>
+                <a href="{% url 'profile' profile.pk %}">
+                    <img  height="30" width="30" src="{{ profile.写真.url }}" class="round-circle post-img"/>
+                </a>
+                <p class="post-text">
+                    <a class="text-primary post-link" href="{% url 'profile' profile.pk %}">@{{ profile.user }}</a>
+                </p>
+            </div>
+            <!-- <p><a href="{% url 'profile' profile.pk %}" class="text-primary post-link">@{{profile.user}}</a></p> -->
+            {% if profile.location %}
+                <p>国：{{profile.location}}</p>
+            {% endif %}
+
+            <p>フォロワー： {{profile.followers.all.count}} <!-- returns number of followers --></p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock content %}

@@ -1,0 +1,127 @@
+{% extends 'landing/base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row mt-5">
+        <div class="col-md-3 col-sm-6">
+           <a href="{% url 'post-list' %}" class="btn btn-light">フィードを行く</a>
+        </div>
+    </div>
+
+    <div class="row justify-content-center mt-3">
+        <div class="card shadow-sm col-md-8 col-sm-12 border-bottom px-5 pt-3">
+            <div class="text-center justify-content-center">
+
+            
+            <img src="{{ profile.写真.url }}" class="rounded-circle" width="100" height="100" />
+            {% if profile.name %}   
+            <h3 class="py-4">{{profile.name}}
+                <span>
+                    {% if request.user == user %}
+                        <a href="{% url 'profile-edit' profile.pk %}" class="edit-colour"><i class="far fa-edit">
+
+                        </i></a>
+                    {% endif %}
+                    {% if profile.サイト %}
+                    <p>{{ profile.サイト | urlize }}</p>
+                    {% endif %}
+                </span>
+                {% else %}
+                <h3 class="py-4">{{user.username}}
+                    <span>
+                        {% if request.user == user %}
+                            <a href="{% url 'profile-edit' profile.pk %}" class="edit-colour"><i class="far fa-edit">
+
+                            </i></a>
+                        {% endif %}
+                    </span>
+                </h3>
+                {% endif %}
+            </h3>
+            </div>
+
+            <div class="row justify-content-center mt-5">
+                <div class="card shadow-sm col-md-8 col-sm-12 border-bottom px-5 pt-3">
+                    {% if profile.国 %}
+                    <p><b>国:</b> {{profile.国}}</p>
+                    {% endif %}
+
+                    {% if profile.誕生日 %}
+                    <p><b>誕生日：</b>{{profile.誕生日|date:"Y年m月d日"}}</p>
+                    {% endif %}
+
+                    {% if profile.自己紹介 %}
+                    <b>自己紹介:</b>
+                    <p>{{profile.自己紹介}}</p>
+                    {% endif %}
+
+                   
+
+                    {% if user == request.user %}
+                    <!-- Do Nothing -->
+                    {% else %}
+                    {% if is_following %}
+                    <!-- current profile's pk-->
+                    <form action="{% url 'remove-follower' profile.pk %}" method="POST">
+                        {% csrf_token %}
+                        <button class="btn btn-outline-danger" type="submit">フォロー中</button>
+                    </form>
+                    {% else %}
+                    <form method="POST" action="{% url 'add-follower' profile.pk %}">
+                        {% csrf_token %}
+                        <button class="btn btn-outline-success" type="submit">フォロー</button>
+                    </form>
+                    {% endif %}
+                    {% endif %}
+                    <a href="{% url 'list-followers' profile.pk %}" class="post-link my-2"><b>フォロワー：</b>  {{number_of_followers}}</a>
+
+
+                </div>
+            </div>
+
+            <div class="mb-3">
+                
+            </div>
+        </div> 
+    </div>
+
+    {% for post in posts %}
+    <div class="row justify-content-center mt-3">
+        <div class="col-md-8 col-sm-12 border-bottom">
+            <div>
+                <a href="{% url 'profile' post.author.profile.pk %}">
+                    <img  height="30" width="30" src="{{ post.author.profile.写真.url }}" class="round-circle post-img"/>
+                </a>
+                <p class="post-text">
+                    <a class="text-primary post-link" href="{% url 'profile' post.author.profile.pk %}">@{{ post.author }}</a> {{ post.created_on|date:"Y/m/d, H:i" }}
+                </p>
+            </div>
+            <div class="position-relative">
+                <p>{{post.body}}</p>
+                <a href="{% url 'post-detail' post.pk %}" class="stretched-link"></a>
+            </div>
+
+            <div class="d-flex flex-row">
+                <form action="{% url 'like' post.pk %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{request.path}}">
+                    <button class="remove-default-btn">
+                        <i class="far fa-thumbs-up" ><span> {{post.likes.all.count }} <!-- all gets all of them. count gets the number of them--></span></i>
+                    </button>
+                </form>
+                <form action="{% url 'dislike' post.pk %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{request.path}}">
+                    <button class="remove-default-btn">
+                        <i class="far fa-thumbs-down"> <span> {{post.dislikes.all.count}}</span></i>
+                    </button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock content %}

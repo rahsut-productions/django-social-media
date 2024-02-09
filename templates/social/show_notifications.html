@@ -1,0 +1,40 @@
+<div class="dropdown">
+    <span class="badge bg-primary notification-badge" onclick="showNotifications()">{{notifications.count}}</span>
+    <div class="dropdown-content d-none" id="notification-container">
+        {% for notification in notifications %} <!-- for a notification in the notifications -->
+            {% if notification.post %} <!-- if the notification is a notification about a post -->
+        <!-- The numbers 1, 2, and 3 have meaning. １，２，と３の意味があります。意味が、socialのmodels.pyに。-->
+                {% if notification.notification_type == 1 %} <!-- User liked this post -->
+                <div class="dropdown-item-parent">
+                    <a href="{% url 'post-notification' notification.pk notification.post.pk%}">@{{ notification.from_user }}は「あなた」のポストを「いいね」しました！</a>
+                    <span class="dropdown-item-close">&times;</span> <!-- &times;   gives a "x", like thet close button on top right of this window -->
+                </div>
+                {% elif notification.notification_type == 2 %}
+                <div class="dropdown-item-parent">
+                    <a href="{% url 'post-notification' notification.pk notification.post.pk%}">@{{ notification.from_user }}は「あなた」のポストを「コメント」しました！</a>
+                    <span class="dropdown-item-close">&times;</span> <!-- &times; gives a "x", like thet close button on top right of this window -->
+                </div>
+                {% endif %}
+            {% elif notification.comment %}
+                {% if notication.notification_type == 1 %}
+                <div class="dropdown-item-parent">
+                    <!-- we get the post primary key off of the comment as it causes errors otherwise -->
+                    <a href="{% url 'post-notification' notification.pk notification.comment.post.pk%}">@{{ notification.from_user }}は「あなた」のコメントを「いいね」しました！</a>
+                    <span class="dropdown-item-close">&times;</span> <!-- &times; gives a "x", like thet close button on top right of this window -->
+                </div>
+                {% elif notification.notification_type == 2 %}
+                <div class="dropdown-item-parent">
+                    <a href="{% url 'post-notification' notification.pk notification.comment.post.pk%}">@{{ notification.from_user }}は「あなた」のコメントを「返信」しました！</a>
+                    <span class="dropdown-item-close">&times;</span> <!-- &times; gives a "x", like thet close button on top right of this window -->
+                </div>
+                {% endif %}                 
+            {% else %} <!-- must be follow notification if not comment or post notification -->
+            <div class="dropdown-item-parent">
+                <a href="{% url 'follow-notification' notification.pk notification.from_user.profile.pk%}">@{{ notification.from_user }}は「あなた」のフォローを「返信」されました！</a>
+                <span class="dropdown-item-close">&times;</span> <!-- &times; gives a "x", like thet close button on top right of this window -->
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+</div>
